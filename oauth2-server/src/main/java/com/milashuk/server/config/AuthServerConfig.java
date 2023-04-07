@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.config.annotation.configurers.ClientD
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 
 @Configuration
 @EnableAuthorizationServer
@@ -22,12 +23,21 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory()
-        .withClient("client_id")
-        .secret("client_secret")
-        .authorizedGrantTypes("password","authorization_code", "client_credentials", "refresh_token")
-        .scopes("read", "info")
-        .redirectUris("http://localhost:9090/home");
+        clients
+                .inMemory()
+                .withClient("client_id")
+                .secret("client_secret")
+                .authorizedGrantTypes("password","authorization_code", "client_credentials", "refresh_token")
+                .scopes("read", "info")
+                .redirectUris("http://localhost:9090/home")
+                .and()
+                .withClient("resourceserver")
+                .secret("resourceserversecret");
+    }
+
+    @Override
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+        security.checkTokenAccess("isAuthenticated()");
     }
 
     /** Long configuration
